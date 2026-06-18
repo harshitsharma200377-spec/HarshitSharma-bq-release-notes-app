@@ -547,6 +547,12 @@ body {
     border-color: #1d9bf0;
 }
 
+.action-icon.copy-icon.success {
+    color: #fff;
+    background-color: var(--accent-announcement);
+    border-color: var(--accent-announcement);
+}
+
 /* HTML content inside Release Note card */
 .card-content {
     font-size: 14px;

@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshIcon = document.getElementById('refresh-icon');
     const refreshText = document.getElementById('refresh-text');
     const lastSyncTime = document.getElementById('last-sync-time');
+    const exportBtn = document.getElementById('export-btn');
     
     const loadingState = document.getElementById('loading-state');
     const errorState = document.getElementById('error-state');
@@ -145,6 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="indicator ${typeClass}"></span>${item.type}
                             </span>
                             <div class="card-actions">
+                                <button class="action-icon copy-icon" title="Copy release note to clipboard">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
                                 <button class="action-icon tweet-icon" title="Tweet this update">
                                     <i class="fa-brands fa-x-twitter"></i>
                                 </button>
@@ -165,8 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Card select logic (click anywhere on the card to compose tweet)
                     card.addEventListener('click', (e) => {
-                        // Skip composer trigger if clicked on links inside the card
-                        if (e.target.tagName === 'A' || e.target.closest('a') && !e.target.closest('.tweet-icon')) {
+                        // Skip composer trigger if clicked on links inside the card or copy button
+                        if (e.target.tagName === 'A' || e.target.closest('a') || e.target.closest('.copy-icon')) {
                             return;
                         }
                         
@@ -176,6 +180,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.innerWidth <= 768) {
                             document.querySelector('.sidebar').scrollIntoView({ behavior: 'smooth' });
                         }
+                    });
+
+                    // Copy to clipboard listener
+                    const copyBtn = card.querySelector('.copy-icon');
+                    copyBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(item.text).then(() => {
+                            const icon = copyBtn.querySelector('i');
+                            icon.className = 'fa-solid fa-check';
+                            copyBtn.classList.add('success');
+                            setTimeout(() => {
+                                icon.className = 'fa-regular fa-copy';
+                                copyBtn.classList.remove('success');
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy text: ', err);
+                        });
                     });
 
                     itemsGrid.appendChild(card);
@@ -295,9 +316,52 @@ document.addEventListener('DOMContentLoaded', () => {
         window.open(twitterUrl, '_blank', 'width=550,height=420');
     }
 
+    // Export active filtered releases to CSV
+    function exportToCSV() {
+        if (allReleases.length === 0) return;
+
+        const csvRows = [];
+        // Add CSV Headers
+        csvRows.push(['Date', 'Update Type', 'Link', 'Content Text']);
+
+        allReleases.forEach(release => {
+            release.items.forEach(item => {
+                const typeMatches = currentFilterType === 'all' || item.type.toLowerCase() === currentFilterType;
+                const searchMatches = searchQuery === '' || 
+                    item.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    release.date.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.type.toLowerCase().includes(searchQuery.toLowerCase());
+
+                if (typeMatches && searchMatches) {
+                    const cleanText = item.text.replace(/"/g, '""').replace(/\s+/g, ' ').trim();
+                    const cleanDate = release.date.replace(/"/g, '""');
+                    const cleanType = item.type.replace(/"/g, '""');
+                    const cleanLink = release.link.replace(/"/g, '""');
+
+                    csvRows.push([`"${cleanDate}"`, `"${cleanType}"`, `"${cleanLink}"`, `"${cleanText}"`]);
+                }
+            });
+        });
+
+        if (csvRows.length <= 1) {
+            alert('No data matches the current filters to export.');
+            return;
+        }
+
+        const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `bigquery_releases_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     // Attach listeners
     refreshBtn.addEventListener('click', fetchReleases);
     retryBtn.addEventListener('click', fetchReleases);
+    exportBtn.addEventListener('click', exportToCSV);
     
     tweetTextarea.addEventListener('input', updateCharCount);
     tweetBtn.addEventListener('click', postTweet);
