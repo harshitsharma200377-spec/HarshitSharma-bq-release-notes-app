@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes & Share Hub</title>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Tweet Panel -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-database animate-pulse"></i>
+                </div>
+                <div>
+                    <h1>BQ Notes</h1>
+                    <span class="subtitle">Cloud Release Monitor</span>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="sidebar-section">
+                <h2><i class="fa-solid fa-sliders"></i> Filter Notes</h2>
+                <div class="filter-group">
+                    <label>Search Content</label>
+                    <div class="search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="Search keywords...">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>Filter by Type</label>
+                    <div class="chip-container" id="type-filters">
+                        <button class="chip active" data-type="all">All</button>
+                        <button class="chip" data-type="feature"><span class="indicator feature"></span>Feature</button>
+                        <button class="chip" data-type="announcement"><span class="indicator announcement"></span>Announcement</button>
+                        <button class="chip" data-type="issue"><span class="indicator issue"></span>Issue</button>
+                        <button class="chip" data-type="deprecation"><span class="indicator deprecation"></span>Deprecation</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Composer Section (Locked / Active States) -->
+            <div class="sidebar-section composer-section">
+                <h2><i class="fa-brands fa-x-twitter"></i> Tweet Composer</h2>
+                <div id="composer-empty" class="composer-empty">
+                    <div class="empty-icon-wrapper">
+                        <i class="fa-solid fa-feather-pointed"></i>
+                    </div>
+                    <p>Select any release note update on the right to start drafting a tweet!</p>
+                </div>
+                
+                <div id="composer-active" class="composer-active hidden">
+                    <div class="selected-meta">
+                        <span class="badge" id="composer-badge">Feature</span>
+                        <span class="date" id="composer-date">June 17, 2026</span>
+                    </div>
+                    <div class="textarea-wrapper">
+                        <textarea id="tweet-textarea" rows="6" maxlength="280" placeholder="What's happening?"></textarea>
+                        <div class="char-counter">
+                            <span id="char-count">0</span>/280
+                        </div>
+                    </div>
+                    <div class="composer-actions">
+                        <button id="tweet-btn" class="btn btn-primary">
+                            <i class="fa-brands fa-x-twitter"></i> Post to X
+                        </button>
+                        <button id="clear-composer-btn" class="btn btn-outline">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Feed Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title-wrapper">
+                    <h2>BigQuery Release Feed</h2>
+                    <p>Stay updated with Google Cloud BigQuery releases and share them instantly.</p>
+                </div>
+                <div class="header-actions">
+                    <span class="last-sync" id="last-sync-time">Last Sync: Never</span>
+                    <button id="refresh-btn" class="btn btn-refresh">
+                        <i id="refresh-icon" class="fa-solid fa-rotate-right"></i>
+                        <span id="refresh-text">Refresh</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-state hidden">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <div class="spinner-inner"></div>
+                </div>
+                <p>Parsing feed & syncing release logs...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" class="error-state hidden">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h3>Oops! Failed to fetch releases</h3>
+                <p>Could not connect to the Google Cloud release feed. Please try again.</p>
+                <button id="retry-btn" class="btn btn-primary">Try Again</button>
+            </div>
+
+            <!-- Feed Content Area -->
+            <div id="feed-container" class="feed-container">
+                <!-- Dynamically populated -->
+            </div>
+        </main>
+    </div>
+
+    <!-- JS file -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
