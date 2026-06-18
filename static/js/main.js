@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshText = document.getElementById('refresh-text');
     const lastSyncTime = document.getElementById('last-sync-time');
     const exportBtn = document.getElementById('export-btn');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeToggleIcon = document.getElementById('theme-toggle-icon');
     
     const loadingState = document.getElementById('loading-state');
     const errorState = document.getElementById('error-state');
@@ -366,6 +368,30 @@ document.addEventListener('DOMContentLoaded', () => {
     tweetTextarea.addEventListener('input', updateCharCount);
     tweetBtn.addEventListener('click', postTweet);
     clearComposerBtn.addEventListener('click', clearComposer);
+    themeToggleBtn.addEventListener('click', toggleTheme);
+
+    // Theme toggler
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+        if (theme === 'light') {
+            themeToggleIcon.className = 'fa-solid fa-moon';
+        } else {
+            themeToggleIcon.className = 'fa-solid fa-sun';
+        }
+    }
 
     // Filter Chips selection
     typeFilters.addEventListener('click', (e) => {
@@ -386,5 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initial load
+    initTheme();
     fetchReleases();
 });
