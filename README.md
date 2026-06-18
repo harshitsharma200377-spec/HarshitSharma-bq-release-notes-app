@@ -2,6 +2,8 @@
 
 A modern, responsive dashboard to monitor official Google Cloud BigQuery release updates and draft/share them on Twitter/X with a single click.
 
+![App Screenshot](app_screenshot.jpg)
+
 ## Features
 - 🔄 **Real-time Synchronization**: Fetches and parses the official Google Cloud BigQuery RSS/Atom release feed.
 - 🏷️ **Intelligent Categorization**: Detects and separates daily release logs into distinct modules based on updates (e.g., Features, Announcements, Issues, Deprecations).
